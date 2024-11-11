@@ -1,10 +1,15 @@
-<?php
-session_start(); // Start the session to manage user data
+<?php 
 
-// Destroy the session to log the user out
+// Start the session to enable access to session variables
+session_start();
+
+// Unset all session variables to clear the session
+session_unset();
+
+// Destroy the session completely
 session_destroy();
 
-// Redirect to login page
-header("Location: index.php");
-exit(); // Ensure no further code is executed after the redirect
+// Redirect the user to the home page after session ends
+exit(header('Location: index.php'));
+
 ?>
