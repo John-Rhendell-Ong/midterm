@@ -1,3 +1,28 @@
+<?php
+session_start(); // Start the session
+
+// Include the functions file
+include('functions.php');
+
+$errors = []; // Initialize an empty array for error messages
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Validate login and handle errors
+    if (validate_login($email, $password, $errors)) {
+        // Successful login, redirect to dashboard.php
+        $_SESSION['user_email'] = $email;
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        // Display errors if login is not successful
+        display_errors($errors);
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,101 +147,29 @@
 </head>
 <body>
 
-<?php
-include('header.php');
-$errors = []; // Initialize an empty array for error messages
+<?php include('header.php'); ?>
 
-// Define dummy accounts
-$dummyAccounts = [
-    ["email" => "user1@example.com", "password" => "password123"],
-    ["email" => "user2@example.com", "password" => "password456"],
-    ["email" => "user3@example.com", "password" => "password789"],
-    ["email" => "user4@example.com", "password" => "password000"],
-    ["email" => "user5@example.com", "password" => "password111"],
-];
+<div class="login-container">
+    <h3>Login</h3>
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
-    $isValidUser = false;
+    <form method="post" action="">
+        <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="Enter email" value="<?php echo htmlspecialchars($email ?? ''); ?>">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Password">
+        </div>
+        <button type="submit">Login</button>
+    </form>
+</div>
 
-    // Check if email and password are provided
-    if (empty($email) && empty($password)) {
-        $errors[] = "Email is required.";
-        $errors[] = "Password is required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) && empty($password)) {
-        $errors[] = "Invalid email.";
-        $errors[] = "Password is required.";
-    } else {
-        // Validate email
-        if (empty($email)) {
-            $errors[] = "Email is required.";
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email format.";
-        }
-
-        // Validate password
-        if (empty($password)) {
-            $errors[] = "Password is required.";
-        }
+<script>
+    function closeErrorMessage() {
+        document.getElementById('errorMessage').style.display = 'none';
     }
-
-    // If no specific errors, check against dummy accounts
-    if (empty($errors)) {
-        foreach ($dummyAccounts as $account) {
-            if ($account['email'] === $email && $account['password'] === $password) {
-                $isValidUser = true;
-                break;
-            }
-        }
-
-        // If no match is found for either email or password, add a single error message
-        if (!$isValidUser) {
-            $errors[] = "Invalid email or password.";
-        }
-    }
-
-    // If there are errors, display them
-    if (!empty($errors)) {
-        echo "<div class='error-message' id='errorMessage'>
-                <span class='close-btn' onclick='closeErrorMessage()'>&times;</span>
-                <strong>System Errors</strong>
-                <ul>";
-        foreach ($errors as $error) {
-            echo "<li>$error</li>";
-        }
-        echo "</ul></div>";
-    } else {
-        // Successful login: Redirect to dashboard.php
-        header("Location: dashboard.php");
-        exit(); // Make sure no further code is executed after the redirect
-    }
-}
-?>
-
-
-
-    <div class="login-container">
-        <h3>Login</h3>
-
-        <form method="post" action="">
-            <div class="form-group">
-                <label for="email">Email address</label>
-                <input type="email" id="email" name="email" placeholder="Enter email">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Password">
-            </div>
-            <button type="submit">Login</button>
-        </form>
-    </div>
-
-    <script>
-        function closeErrorMessage() {
-            document.getElementById('errorMessage').style.display = 'none';
-        }
-    </script>
+</script>
 
 </body>
 </html>
