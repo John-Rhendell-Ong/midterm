@@ -35,8 +35,6 @@ $userEmail = $_SESSION['user_email']; // Get the logged-in user's email
             --primary-hover: #0056b3;
             --danger-color: #ff4d4d;
             --danger-hover: #d63636;
-            --add-subject-bg: white; /* Light blue background for Add Subject */
-            --register-bg: #fef3e0; /* Light yellow background for Register Student */
         }
 
         * {
@@ -70,7 +68,7 @@ $userEmail = $_SESSION['user_email']; // Get the logged-in user's email
 
         header h1 {
             font-size: 2.5em;
-            color: black;   
+            color: black;
         }
 
         .logout-button {
@@ -123,7 +121,6 @@ $userEmail = $_SESSION['user_email']; // Get the logged-in user's email
             margin-left: -28px;
             margin-right: -28.1px;
             margin-top: -29px;
-           
         }
 
         .card h2 {
@@ -133,7 +130,7 @@ $userEmail = $_SESSION['user_email']; // Get the logged-in user's email
         }
 
         .card p {
-            font-size:1em;
+            font-size: 1em;
             color: var(--subtext-color);
             margin-bottom: 1.5em;
         }
@@ -171,7 +168,7 @@ $userEmail = $_SESSION['user_email']; // Get the logged-in user's email
     <div class="container">
         <header>
             <h1>Welcome to the System: <?php echo htmlspecialchars($userEmail); ?></h1>
-            <!-- Logout Button -->
+            <!-- Logout Form -->
             <form method="POST" action="logout.php">
                 <button type="submit" class="logout-button">Logout</button>
             </form>
