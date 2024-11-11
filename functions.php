@@ -50,18 +50,17 @@ function authenticateUser($email, $password, $users) {
 }
 
 // Function to ensure the session is active
-function ensureSessionIsActive() {
+function ensureUserIsAuthenticated() {
+    // Start the session if it has not been started already
     if (session_status() == PHP_SESSION_NONE) {
-        session_start();  // Start a session if none exists
+        session_start();
     }
 
-    // Check if user is logged in
-    if (!empty($_SESSION['user_email'])) {
-        // Redirect to the previous page or dashboard if logged in
-        if (!empty($_SESSION['redirect_url'])) {
-            header("Location: " . $_SESSION['redirect_url']);
-            exit;
-        }
+    // Check if the user is logged in
+    if (empty($_SESSION['user_email'])) {
+        // If not logged in, redirect to the login page
+        header("Location: login.php");
+        exit();
     }
 }
 
