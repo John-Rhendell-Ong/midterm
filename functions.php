@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 // Start the session if it's not already started
 if (session_status() == PHP_SESSION_NONE) {
@@ -17,89 +17,69 @@ function getUserData() {
 }
 
 // Function to check if the credentials are valid
-function verifyLogin($email, $password) {
-    $errorMessages = [];
-    $users = getUserData();  // Fetch the dummy accounts
+function validateLoginCredentials($email, $password) {
+    $errors = [];
+    $users = getUserData();
 
     // Validate email address
     if (empty($email)) {
-        $errorMessages['email'] = 'Email is required!';
+        $errors[] = "Email is required!";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errorMessages['email'] = 'Invalid email format!';
+        $errors[] = "Invalid email format!";
     }
 
     // Validate password
     if (empty($password)) {
-        $errorMessages['password'] = 'Password is required!';
+        $errors[] = "Password is required!";
     }
 
-    // If no validation errors, proceed to check credentials
-    if (empty($errorMessages)) {
-        if (!authenticateUser($email, $password, $users)) {
-            $errorMessages['credentials'] = 'Incorrect email or password!';
+    // Validate if the credentials match any user in the database
+    if (empty($errors)) {
+        $isAuthenticated = false;
+        foreach ($users as $user) {
+            if ($user['email'] === $email && $user['password'] === $password) {
+                $isAuthenticated = true;
+                break;
+            }
+        }
+
+        if (!$isAuthenticated) {
+            $errors[] = "Incorrect email or password!";
         }
     }
 
-    return $errorMessages;
+    return $errors;
 }
 
-// Function to authenticate the user by checking the provided email and password
-function authenticateUser($email, $password, $users) {
-    foreach ($users as $user) {
-        if ($user['email'] === $email && $user['password'] === $password) {
-            return true; // Authentication successful
-        }
+// Function to check if the user session is active
+function checkUserSessionIsActive() {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start(); // Start session if not already started
     }
-    return false; // Authentication failed
-}
 
-// Function to ensure the session is active and the user is authenticated
-function ensureUserIsAuthenticated() {
-    // Check if the user is logged in
-    if (empty($_SESSION['user_email'])) {
-        // If not logged in, redirect to the login page
-        header("Location: login.php");
-        exit(); // Stop further execution
+    // Check if the session variable for user email is set (i.e., the user is logged in)
+    if (isset($_SESSION['userEmail'])) {
+        // Redirect to dashboard if session is active
+        header("Location: dashboard.php");
+        exit();
     }
 }
 
 // Function to display error messages
-function showErrorMessages($messages) {
-    if (empty($messages)) {
-        return '';  // Return an empty string if there are no errors
+function displayErrors($errors) {
+    if (empty($errors)) {
+        return ''; // No errors to display
     }
 
-    $output = '
-    <div class="alert alert-danger alert-dismissible fade show" style="max-width: 400px; position: absolute; top: 20px; left: 50%; transform: translateX(-50%);" role="alert">
-        <strong>Errors:</strong> Please resolve the following issues:
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        <hr>
-        <ul>';
-
-    foreach ($messages as $message) {
-        $output .= '<li>' . htmlspecialchars($message) . '</li>';
+    $output = '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Errors:</strong><br>';
+    foreach ($errors as $error) {
+        $output .= $error . '<br>';
     }
-    $output .= '</ul></div>';
-
+    $output .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>';
+    
     return $output;
-}
-
-// Function to render a single error message (for individual use cases)
-function renderSingleError($message) {
-    if (empty($message)) {
-        return '';  // Return nothing if no message exists
-    }
-
-    return '
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        ' . htmlspecialchars($message) . '
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>';
-}
-
-// Helper function to get the base URL of the site
-function getSiteURL() {
-    return 'http://localhost/your_project_name/';  // Change this to your actual base URL
 }
 
 ?>
