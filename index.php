@@ -3,7 +3,7 @@
 // Include the required functions file
 include 'functions.php';
 
-// Ensure the user session is active
+// Ensure the user session is active (redirect if already logged in)
 checkUserSessionIsActive();
 
 // Initialize variables
@@ -22,8 +22,8 @@ if (isset($_POST['submitLogin'])) {
     // If validation passes, initiate session and redirect
     if (empty($formErrors)) {
         session_start();
-        $_SESSION['userEmail'] = $userEmail;
-        header("Location: dashboard.php");
+        $_SESSION['userEmail'] = $userEmail; // Store the user's email in the session
+        header("Location: dashboard.php"); // Redirect to the dashboard
         exit();
     }
 }
