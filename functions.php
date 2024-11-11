@@ -1,96 +1,115 @@
-<?php
+<?php 
 
-// Dummy accounts for authentication
-$dummyAccounts = [
-    ["email" => "user1@example.com", "password" => "password123"],
-    ["email" => "user2@example.com", "password" => "password456"],
-    ["email" => "user3@example.com", "password" => "password789"],
-    ["email" => "user4@example.com", "password" => "password000"],
-    ["email" => "user5@example.com", "password" => "password111"],
-];
-
-/**
- * Function to validate login credentials.
- *
- * @param string $email User email.
- * @param string $password User password.
- * @param array  &$errors Reference to the array holding error messages.
- *
- * @return bool True if login is valid, false if invalid.
- */
-function validate_login($email, $password, &$errors) {
-    global $dummyAccounts;
-
-    // Trim the input to remove leading/trailing spaces
-    $email = trim($email);
-    $password = trim($password);
-
-    // Validate email and password
-    if (empty($email) && empty($password)) {
-        $errors[] = "Email is required.";
-        $errors[] = "Password is required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) && empty($password)) {
-        $errors[] = "Invalid email.";
-        $errors[] = "Password is required.";
-    } else {
-        // Validate email format
-        if (empty($email)) {
-            $errors[] = "Email is required.";
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email format.";
-        }
-
-        // Validate password
-        if (empty($password)) {
-            $errors[] = "Password is required.";
-        }
-    }
-
-    // If no errors so far, check against the dummy accounts
-    if (empty($errors)) {
-        $isValidUser = false;
-        foreach ($dummyAccounts as $account) {
-            if ($account['email'] === $email && $account['password'] === $password) {
-                $isValidUser = true;
-                break;
-            }
-        }
-
-        // If the credentials do not match, add error
-        if (!$isValidUser) {
-            $errors[] = "Invalid email or password.";
-        }
-    }
-
-    // Return true if no errors were found, otherwise false
-    return empty($errors);
+// Dummy user data for authentication
+function getUserData() {
+    return [
+        ["email" => "user1@example.com", "password" => "password123"],
+        ["email" => "user2@example.com", "password" => "password456"],
+        ["email" => "user3@example.com", "password" => "password789"],
+        ["email" => "user4@example.com", "password" => "password000"],
+        ["email" => "user5@example.com", "password" => "password111"]
+    ];
 }
 
-/**
- * Function to display error messages in HTML.
- *
- * @param array $errors Array of error messages.
- */
-function display_errors($errors) {
-    // Display error messages in a styled box
-    echo "<div class='error-message' id='errorMessage'>
-            <span class='close-btn' onclick='closeErrorMessage()'>&times;</span>
-            <strong>System Errors</strong>
-            <ul>";
-    foreach ($errors as $error) {
-        echo "<li>$error</li>";
+// Function to check if the credentials are valid
+function verifyLogin($email, $password) {
+    $errorMessages = [];
+    $users = getUserData();  // Fetch the dummy accounts
+
+    // Validate email address
+    if (empty($email)) {
+        $errorMessages['email'] = 'Email is required!';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errorMessages['email'] = 'Invalid email format!';
     }
-    echo "</ul></div>";
+
+    // Validate password
+    if (empty($password)) {
+        $errorMessages['password'] = 'Password is required!';
+    }
+
+    // If no validation errors, proceed to check credentials
+    if (empty($errorMessages)) {
+        if (!authenticateUser($email, $password, $users)) {
+            $errorMessages['credentials'] = 'Incorrect email or password!';
+        }
+    }
+
+    return $errorMessages;
 }
 
-/**
- * Function to redirect the user to a new page.
- *
- * @param string $url The destination URL to redirect to.
- */
-function redirect_to($url) {
-    header("Location: $url");
-    exit(); // Ensures no further code is executed after the redirect
+// Function to authenticate the user by checking the provided email and password
+function authenticateUser($email, $password, $users) {
+    // Loop through each user and check if their credentials match
+    foreach ($users as $user) {
+        if ($user['email'] === $email && $user['password'] === $password) {
+            return true; // Authentication successful
+        }
+    }
+    return false; // Authentication failed
+}
+
+// Function to ensure the session is active
+function ensureSessionIsActive() {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();  // Start a session if none exists
+    }
+
+    // Check if user is logged in
+    if (!empty($_SESSION['user_email'])) {
+        // Redirect to the previous page or dashboard if logged in
+        if (!empty($_SESSION['redirect_url'])) {
+            header("Location: " . $_SESSION['redirect_url']);
+            exit;
+        }
+    }
+}
+
+// Function to restrict access if the user is not logged in
+function enforceLogin() {
+    if (empty($_SESSION['user_email'])) {    
+        header("Location: login.php");  // Redirect to the login page
+        exit;
+    }
+}
+
+// Function to display error messages
+function showErrorMessages($messages) {
+    if (empty($messages)) {
+        return '';  // Return an empty string if there are no errors
+    }
+
+    $output = '
+    <div class="alert alert-danger alert-dismissible fade show" style="max-width: 400px; position: absolute; top: 20px; left: 50%; transform: translateX(-50%);" role="alert">
+        <strong>Errors:</strong> Please resolve the following issues:
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <hr>
+        <ul>';
+
+    foreach ($messages as $message) {
+        $output .= '<li>' . htmlspecialchars($message) . '</li>';
+    }
+    $output .= '</ul></div>';
+
+    return $output;
+}
+
+// Function to render a single error message (for individual use cases)
+function renderSingleError($message) {
+    if (empty($message)) {
+        return '';  // Return nothing if no message exists
+    }
+
+    return '
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        ' . htmlspecialchars($message) . '
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>';
+}
+
+// Helper function to get the base URL of the site
+function getSiteURL() {
+    return 'http://localhost/your_project_name/';  // Change this to your actual base URL
 }
 
 ?>
