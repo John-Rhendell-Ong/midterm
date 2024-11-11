@@ -1,4 +1,5 @@
 <?php
+
 // Dummy accounts for authentication
 $dummyAccounts = [
     ["email" => "user1@example.com", "password" => "password123"],
@@ -91,4 +92,5 @@ function redirect_to($url) {
     header("Location: $url");
     exit(); // Ensures no further code is executed after the redirect
 }
+
 ?>
