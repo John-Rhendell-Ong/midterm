@@ -1,8 +1,8 @@
 <?php
 session_start(); // Start the session
 
-// Include the functions file
-include('functions.php');
+// Include the functions file - ensure the path is correct
+include('functions.php'); // Make sure this is the correct path to the functions.php file
 
 $errors = []; // Initialize an empty array for error messages
 
@@ -14,11 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (validate_login($email, $password, $errors)) {
         // Successful login, redirect to dashboard.php
         $_SESSION['user_email'] = $email;
-        header("Location: dashboard.php");
-        exit();
+        redirect_to('dashboard.php');
     } else {
         // Display errors if login is not successful
-        display_errors($errors);
+        display_errors($errors); // Call display_errors() to show errors
     }
 }
 ?>
