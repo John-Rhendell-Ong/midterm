@@ -1,5 +1,10 @@
 <?php 
 
+// Start the session if it's not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Dummy user data for authentication
 function getUserData() {
     return [
@@ -40,7 +45,6 @@ function verifyLogin($email, $password) {
 
 // Function to authenticate the user by checking the provided email and password
 function authenticateUser($email, $password, $users) {
-    // Loop through each user and check if their credentials match
     foreach ($users as $user) {
         if ($user['email'] === $email && $user['password'] === $password) {
             return true; // Authentication successful
@@ -49,26 +53,13 @@ function authenticateUser($email, $password, $users) {
     return false; // Authentication failed
 }
 
-// Function to ensure the session is active
+// Function to ensure the session is active and the user is authenticated
 function ensureUserIsAuthenticated() {
-    // Start the session if it has not been started already
-    if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-    }
-
     // Check if the user is logged in
     if (empty($_SESSION['user_email'])) {
         // If not logged in, redirect to the login page
         header("Location: login.php");
-        exit();
-    }
-}
-
-// Function to restrict access if the user is not logged in
-function enforceLogin() {
-    if (empty($_SESSION['user_email'])) {    
-        header("Location: login.php");  // Redirect to the login page
-        exit;
+        exit(); // Stop further execution
     }
 }
 
