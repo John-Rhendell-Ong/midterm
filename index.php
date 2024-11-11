@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
             background-color: white;
         }
-        
+
         .login-container h3 {
             font-size: 24px;
             font-weight: bold;
@@ -107,16 +107,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 5px 5px 0 0;
             color: black;
         }
-        
+
         .form-group {
             margin: 15px 20px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 5px;
         }
-        
+
         input[type="email"],
         input[type="password"] {
             width: 95%;
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 4px;
             font-size: 16px;
         }
-        
+
         button {
             width: calc(100% - 40px);
             margin: 0 20px 20px 20px;
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
             font-size: 16px;
         }
-        
+
         button:hover {
             background-color: #0056b3;
         }
